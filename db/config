@@ -1,0 +1,6 @@
+serverName=localhost
+port=3306
+database=mybooks
+user=mybooksadmin
+password=9p4bFsR;S)Y>
+useSSL=false

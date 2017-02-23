@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 
 public class BookService {
 
@@ -29,18 +30,10 @@ public class BookService {
     }
 
     public CompletableFuture<List<Book>> getBooksByCategoryAsync(String categoryName) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return fetchBooksByCategory(categoryName);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
+        return CompletableFuture.supplyAsync(() -> fetchBooksByCategory(categoryName), Executors.newFixedThreadPool(10));
     }
 
-    List<Book> fetchBooksByCategory(String categoryName) {
-        // TODO: Build url for given use case, execute HTTP GET call, parse JSON to List<Book>
+    private List<Book> fetchBooksByCategory(String categoryName) {
         final String route = getUrlOfRequest("subject:" + categoryName);
         try {
             JsonNode root = HttpUtils.get(route);

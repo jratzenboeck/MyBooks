@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class BookServiceTest {
 
@@ -15,9 +16,21 @@ public class BookServiceTest {
     }
 
     @Test
-    public void testFetchBooksByCategory() {
-        List<Book> books = bookService.fetchBooksByCategory("flowers");
+    public void testFindBooksByCategory() throws InterruptedException {
+        CompletableFuture<List<Book>> futureBooks = bookService.getBooksByCategoryAsync("flowers");
+        futureBooks.handle((books, exception) -> {
+            if (books != null) {
+                System.out.println(books);
+                Assert.assertEquals(10, books.size());
+                return true;
+            } else {
+                System.out.println(exception.toString());
+                Assert.fail();
+                return false;
+            }
+        });
 
-        Assert.assertEquals(10, books.size());
+        System.out.println("Processing....");
+        Thread.sleep(10000);
     }
 }

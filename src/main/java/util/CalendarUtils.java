@@ -24,6 +24,7 @@ public class CalendarUtils {
         try {
             calendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(date));
         } catch (ParseException e) {
+            e.printStackTrace();
             return null;
         }
         return calendar;

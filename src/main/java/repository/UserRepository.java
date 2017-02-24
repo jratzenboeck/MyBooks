@@ -5,8 +5,6 @@ import entity.User;
 import entity.UserCredentials;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.BeanHandler;
-import org.apache.commons.dbutils.handlers.BeanListHandler;
 import util.PasswordHashing;
 
 import java.sql.Connection;
@@ -15,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class UserRepository implements CrudRepository<User> {
+public class UserRepository implements CrudRepository {
 
     private final Connection connection;
     private final QueryRunner queryRunner;
@@ -41,11 +39,11 @@ public class UserRepository implements CrudRepository<User> {
         return batchUpdate(readingInterests, sql, queryRunner, connection, user.getId());
     }
 
-    public User authenticate(String username, String plainPassword) {
+    public User authenticate(String username, char[] plainPassword) {
         final User user = findByUserName(username);
 
         if (user != null) {
-            final byte[] hashedPassword = PasswordHashing.hashPassword(plainPassword.toCharArray(), user.getSalt());
+            final byte[] hashedPassword = PasswordHashing.hashPassword(plainPassword, user.getSalt());
             if (Arrays.equals(hashedPassword, user.getPassword())) {
                 return user;
             }
@@ -67,27 +65,6 @@ public class UserRepository implements CrudRepository<User> {
         };
         try {
             return queryRunner.query(connection, sql, resultSetHandler, username);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public List<Category> getReadingInterests(Long userId) {
-        final String sql = "select * from category " +
-                "where category.id in (select reading_interest.category_id from reading_interest " +
-                "where reading_interest.user_id = ?)";
-        final ResultSetHandler<List<Category>> resultSetHandler = (rs) -> {
-            List<Category> found = new ArrayList<>();
-            while (rs.next()) {
-                found.add(new Category(rs.getLong("id"),
-                        rs.getString("name")));
-            }
-            return found;
-        };
-
-        try {
-            return queryRunner.query(connection, sql, resultSetHandler, userId);
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

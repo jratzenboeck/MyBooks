@@ -15,17 +15,15 @@ import java.util.List;
 public class UserRepositoryTest {
 
     private UserRepository userRepository;
-    private CategoryRepository categoryRepository;
     private Connection conn;
 
     private static final String ANY_USERNAME = "juergen";
-    private static final String ANY_PASSWORD = "admin";
+    private static final char[] ANY_PASSWORD = "admin".toCharArray();
 
     @Before
     public void setUp() {
         conn = TestUtils.setUpDatabase();
         userRepository = new UserRepository(conn);
-        categoryRepository = new CategoryRepository(conn);
     }
 
     @Test
@@ -62,7 +60,7 @@ public class UserRepositoryTest {
     public void testAuthenticateFailWrongPassword() {
         userRepository.save(createTestUser());
 
-        User authenticated = userRepository.authenticate(ANY_USERNAME, "wrongPassword");
+        User authenticated = userRepository.authenticate(ANY_USERNAME, "wrongPassword".toCharArray());
         Assert.assertNull(authenticated);
     }
 
@@ -70,25 +68,8 @@ public class UserRepositoryTest {
     public void testAuthenticateFailWrongUsernameAndPassword() {
         userRepository.save(createTestUser());
 
-        User authenticated = userRepository.authenticate("wrongUsername", "wrongPassword");
+        User authenticated = userRepository.authenticate("wrongUsername", "wrongPassword".toCharArray());
         Assert.assertNull(authenticated);
-    }
-
-    @Test
-    public void testGetReadingInterests() {
-        Category sports = categoryRepository.save(new Category("Sports"));
-        Category science = categoryRepository.save(new Category("Science"));
-
-        User user = createTestUser();
-        user.addReadingInterest(sports);
-        user.addReadingInterest(science);
-
-        user = userRepository.save(user);
-
-        List<Category> readingInterests = userRepository.getReadingInterests(user.getId());
-
-        Assert.assertNotNull(readingInterests);
-        Assert.assertEquals(2, readingInterests.size());
     }
 
     private User createTestUser() {

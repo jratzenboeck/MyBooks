@@ -9,10 +9,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class BookServiceTest {
 
-    private final BookService bookService;
+    private final MyBooksService bookService;
 
     public BookServiceTest() {
-        this.bookService = new BookService();
+        this.bookService = new MyBooksService();
     }
 
     @Test

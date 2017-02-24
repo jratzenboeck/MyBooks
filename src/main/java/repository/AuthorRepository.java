@@ -8,7 +8,7 @@ import org.apache.commons.dbutils.handlers.BeanHandler;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class AuthorRepository implements CrudRepository<Author> {
+public class AuthorRepository implements CrudRepository {
 
     private final Connection connection;
     private final QueryRunner queryRunner;

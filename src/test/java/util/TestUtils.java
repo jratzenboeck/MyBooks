@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -18,7 +17,7 @@ public class TestUtils {
     public static Connection setUpDatabase() {
         final Connection conn;
         try {
-            conn = DatabaseConnector.getDatabaseConnectionForTest();
+            conn = DatabaseUtils.getDatabaseConnectionForTest();
             RunScript.execute(conn, new FileReader(CREATE_SCRIPT));
         } catch (SQLException | FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -26,10 +25,10 @@ public class TestUtils {
         return conn;
     }
 
-    public static User createTestUser(String username, String password) {
+    public static User createTestUser(String username, char[] password) {
         byte[] salt = PasswordHashing.generateSalt();
         UserCredentials credentials = new UserCredentials(
-                PasswordHashing.hashPassword(password.toCharArray(), salt), salt);
+                PasswordHashing.hashPassword(password, salt), salt);
 
         User user = new User(username, credentials);
 

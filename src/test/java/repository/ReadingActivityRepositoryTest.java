@@ -69,7 +69,7 @@ public class ReadingActivityRepositoryTest {
     }
 
     private User createTestUser() {
-        return TestUtils.createTestUser("juergen", "pwd");
+        return TestUtils.createTestUser("juergen", "pwd".toCharArray());
     }
 
     private ReadingActivity createReadingActivity(User user, String bookTitle) {

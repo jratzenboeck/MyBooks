@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class ReadingActivityRepository implements CrudRepository<ReadingActivity> {
+public class ReadingActivityRepository implements CrudRepository {
 
     private final Connection connection;
     private final QueryRunner queryRunner;

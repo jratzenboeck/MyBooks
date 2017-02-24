@@ -1,6 +1,9 @@
 package util;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import entity.BaseEntity;
+import entity.Category;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.h2.jdbcx.JdbcDataSource;
 
 import javax.sql.DataSource;
@@ -10,11 +13,13 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.JDBCType;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class DatabaseConnector {
+public class DatabaseUtils {
 
     private static final String PATH_TO_DB_CONFIG = "./db/config";
 

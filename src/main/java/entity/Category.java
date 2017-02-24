@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class Category extends BaseEntity {
 
-    private Long id;
     private final String name;
 
     public Category(Long id, String name) {
@@ -17,5 +16,10 @@ public class Category extends BaseEntity {
 
     public Category(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

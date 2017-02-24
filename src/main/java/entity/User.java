@@ -36,11 +36,11 @@ public class User extends BaseEntity {
         return credentials.getSalt();
     }
 
-    public boolean hasReadingInterests() {
-        return !readingInterests.isEmpty();
-    }
-
     public void addReadingInterest(Category category) {
         readingInterests.add(category);
+    }
+
+    public void addReadingInterests(List<Category> categories) {
+        readingInterests.addAll(categories);
     }
 }

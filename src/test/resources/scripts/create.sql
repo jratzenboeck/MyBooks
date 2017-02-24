@@ -2,8 +2,8 @@ CREATE TABLE user
 (
     id INT(4) PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(32) NOT NULL,
-    password VARCHAR(256) NOT NULL,
-    salt VARCHAR(64) NOT NULL
+    password VARBINARY(256) NOT NULL,
+    salt VARBINARY(64) NOT NULL
 );
 CREATE UNIQUE INDEX user_username_uindex ON user (username);
 

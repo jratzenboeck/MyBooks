@@ -1,9 +1,6 @@
 package repository;
 
-import com.sun.xml.internal.rngom.parse.host.Base;
 import entity.BaseEntity;
-import entity.Category;
-import entity.User;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
@@ -11,12 +8,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface CrudRepository<T> {
+public interface CrudRepository {
 
     default BaseEntity save(BaseEntity obj, QueryRunner queryRunner, Connection connection, String sql, Object... params) {
         try {
             obj.setId(queryRunner.insert(connection, sql,
-                    getResultSetHandler(), params));
+                    getIdResultSetHandler(), params));
             return obj;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -24,7 +21,7 @@ public interface CrudRepository<T> {
         return null;
     }
 
-    default ResultSetHandler<Long> getResultSetHandler() {
+    default ResultSetHandler<Long> getIdResultSetHandler() {
         return (rs) -> {
             if (!rs.next()) {
                 return null;
@@ -35,7 +32,7 @@ public interface CrudRepository<T> {
 
     default int batchUpdate(List<? extends BaseEntity> batch, String sql, QueryRunner queryRunner, Connection connection, Object param) {
         class SumObj {
-            public int sum = 0;
+            private int sum = 0;
         }
         final SumObj sumObj = new SumObj();
         batch.forEach(item -> {

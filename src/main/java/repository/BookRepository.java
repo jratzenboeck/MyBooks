@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-public class BookRepository implements CrudRepository<Book> {
+public class BookRepository implements CrudRepository {
 
     private final Connection connection;
     private final QueryRunner queryRunner;

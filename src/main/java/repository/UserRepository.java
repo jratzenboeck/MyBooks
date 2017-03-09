@@ -9,9 +9,9 @@ import util.PasswordHashing;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class UserRepository implements CrudRepository {
 
@@ -23,14 +23,15 @@ public class UserRepository implements CrudRepository {
         this.queryRunner = new QueryRunner();
     }
 
-    public User save(User user) {
+    public Optional<User> save(User user) {
         final String sql = "insert into user(username, password, salt) " +
                 "values(?, ?, ?)";
-        user = (User) save(user, queryRunner, connection, sql, user.getUsername(),
-                user.getPassword(), user.getSalt());
-        saveReadingInterests(user, user.getReadingInterests());
 
-        return user;
+        Optional<User> optionalUser = (Optional<User>) save(user, queryRunner, connection, sql, user.getUsername(),
+                user.getPassword(), user.getSalt());
+        optionalUser.ifPresent(u -> saveReadingInterests(user, user.getReadingInterests()));
+
+        return optionalUser;
     }
 
     public int saveReadingInterests(User user, List<Category> readingInterests) {
@@ -39,20 +40,22 @@ public class UserRepository implements CrudRepository {
         return batchUpdate(readingInterests, sql, queryRunner, connection, user.getId());
     }
 
-    public User authenticate(String username, char[] plainPassword) {
-        final User user = findByUserName(username);
+    public Optional<User> authenticate(String username, char[] plainPassword) {
+        final Optional<User> optionalUser = findByUserName(username);
 
-        if (user != null) {
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
             final byte[] hashedPassword = PasswordHashing.hashPassword(plainPassword, user.getSalt());
             if (Arrays.equals(hashedPassword, user.getPassword())) {
-                return user;
+                return Optional.of(user);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    private User findByUserName(String username) {
+    private Optional<User> findByUserName(String username) {
         final String sql = "select * from user where username = ?";
+        Optional<User> user = Optional.empty();
 
         final ResultSetHandler<User> resultSetHandler = (rs) -> {
             if (!rs.next()) {
@@ -64,10 +67,10 @@ public class UserRepository implements CrudRepository {
                             rs.getBytes("salt")));
         };
         try {
-            return queryRunner.query(connection, sql, resultSetHandler, username);
+            user = Optional.ofNullable(queryRunner.query(connection, sql, resultSetHandler, username));
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return user;
     }
 }

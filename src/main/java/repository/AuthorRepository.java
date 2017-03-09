@@ -3,10 +3,10 @@ package repository;
 import entity.Author;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.BeanHandler;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class AuthorRepository implements CrudRepository {
 
@@ -18,14 +18,15 @@ public class AuthorRepository implements CrudRepository {
         this.queryRunner = new QueryRunner();
     }
 
-    public Author save(Author author) {
+    public Optional<Author> save(Author author) {
         final String sql = "insert into author(name) " +
                 "values(?)";
-        return (Author) save(author, queryRunner, connection, sql, author.getName());
+        return (Optional<Author>) save(author, queryRunner, connection, sql, author.getName());
     }
 
-    public Author find(Long id) {
-        final String sql = "select * from author where id = ?";
+    public Optional<Author> find(String name) {
+        final String sql = "select * from author where name = ?";
+        Optional<Author> optionalAuthor = Optional.empty();
 
         try {
             final ResultSetHandler<Author> resultSetHandler = (rs) -> {
@@ -35,10 +36,10 @@ public class AuthorRepository implements CrudRepository {
                 return new Author(rs.getLong("id"),
                         rs.getString("name"));
             };
-            return queryRunner.query(connection, sql, resultSetHandler, id);
+            optionalAuthor = Optional.ofNullable(queryRunner.query(connection, sql, resultSetHandler, name));
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return optionalAuthor;
     }
 }

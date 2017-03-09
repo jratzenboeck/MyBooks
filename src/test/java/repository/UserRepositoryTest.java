@@ -10,7 +10,6 @@ import util.TestUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 
 public class UserRepositoryTest {
 
@@ -28,8 +27,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testSave() {
-        User user = createTestUser();
-        Assert.assertNotNull(userRepository.save(user).getId());
+        Assert.assertTrue(userRepository.save(createTestUser()).isPresent());
     }
 
     @Test
@@ -37,39 +35,35 @@ public class UserRepositoryTest {
         User user = createTestUser();
         user.addReadingInterest(new Category("Sports"));
 
-        Assert.assertNotNull(userRepository.save(user).getId());
+        Assert.assertTrue(userRepository.save(user).isPresent());
     }
 
     @Test
     public void testAuthenticate() {
         userRepository.save(createTestUser());
 
-        User authenticated = userRepository.authenticate(ANY_USERNAME, ANY_PASSWORD);
-        Assert.assertNotNull(authenticated);
+        Assert.assertTrue(userRepository.authenticate(ANY_USERNAME, ANY_PASSWORD).isPresent());
     }
 
     @Test
     public void testAuthenticateFailWrongUsername() {
         userRepository.save(createTestUser());
 
-        User authenticated = userRepository.authenticate("wrongUsername", ANY_PASSWORD);
-        Assert.assertNull(authenticated);
+        Assert.assertFalse(userRepository.authenticate("wrongUsername", ANY_PASSWORD).isPresent());
     }
 
     @Test
     public void testAuthenticateFailWrongPassword() {
         userRepository.save(createTestUser());
 
-        User authenticated = userRepository.authenticate(ANY_USERNAME, "wrongPassword".toCharArray());
-        Assert.assertNull(authenticated);
+        Assert.assertFalse(userRepository.authenticate(ANY_USERNAME, "wrongPassword".toCharArray()).isPresent());
     }
 
     @Test
     public void testAuthenticateFailWrongUsernameAndPassword() {
         userRepository.save(createTestUser());
 
-        User authenticated = userRepository.authenticate("wrongUsername", "wrongPassword".toCharArray());
-        Assert.assertNull(authenticated);
+        Assert.assertFalse(userRepository.authenticate("wrongUsername", "wrongPassword".toCharArray()).isPresent());
     }
 
     private User createTestUser() {

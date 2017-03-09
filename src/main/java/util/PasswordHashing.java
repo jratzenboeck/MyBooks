@@ -7,12 +7,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
-/**
- * Created by juergen on 10/02/2017.
- */
 public class PasswordHashing {
 
-    private static final int ITERATIONS = 1000;
+    private static final int ITERATIONS = 10;
     private static final int SALT_LENGTH = 32;
     private static final int KEY_LENGTH = 256;
 

@@ -7,18 +7,21 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface CrudRepository {
 
-    default BaseEntity save(BaseEntity obj, QueryRunner queryRunner, Connection connection, String sql, Object... params) {
+    default Optional<? extends BaseEntity> save(BaseEntity obj, QueryRunner queryRunner, Connection connection, String sql, Object... params) {
+        Optional<? extends BaseEntity> optionalBaseEntity = Optional.empty();
+
         try {
             obj.setId(queryRunner.insert(connection, sql,
                     getIdResultSetHandler(), params));
-            return obj;
+            optionalBaseEntity = Optional.ofNullable(obj);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return optionalBaseEntity;
     }
 
     default ResultSetHandler<Long> getIdResultSetHandler() {

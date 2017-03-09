@@ -4,29 +4,35 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 
 public class CalendarUtils {
 
-    public static Calendar parseCalendar(Date date) {
+    public static Optional<Calendar> parseCalendar(Date date) {
         if (date == null) {
-            return null;
+            return Optional.empty();
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        return calendar;
+        return Optional.of(calendar);
     }
 
-    public static Calendar parseCalendar(String date) {
+    public static Optional<Calendar> parseCalendar(String date) {
         if (date == null) {
-            return null;
+            return Optional.empty();
         }
         Calendar calendar = Calendar.getInstance();
         try {
             calendar.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(date));
         } catch (ParseException e) {
             e.printStackTrace();
-            return null;
+            calendar.set(1970, 0, 1);
         }
-        return calendar;
+        return Optional.of(calendar);
+    }
+
+    public static String formatDate(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+        return simpleDateFormat.format(date);
     }
 }

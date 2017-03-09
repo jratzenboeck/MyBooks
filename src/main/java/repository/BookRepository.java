@@ -2,12 +2,13 @@ package repository;
 
 import entity.Author;
 import entity.Book;
-import entity.Category;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class BookRepository implements CrudRepository {
 
@@ -19,15 +20,16 @@ public class BookRepository implements CrudRepository {
         this.queryRunner = new QueryRunner();
     }
 
-    public Book save(Book book) {
-        final String sql = "insert into book(title, publish_date, language_iso2, pageCount, retailPrice, category_id)" +
-                "values(?, ?, ?, ?, ?, ?)";
-        book = (Book) save(book, queryRunner, connection, sql,
-                book.getTitle(), book.getPublishDate().getTime(), book.getLanguageIso2(),
-                book.getPageCount(), book.getRetailPrice(), book.getCategory().getId());
-        saveAuthorsForBook(book, book.getAuthors());
+    public Optional<Book> save(Book book) {
+        final String sql = "insert into book(title, language_iso2, pageCount, retailPrice)" +
+                "values(?, ?, ?, ?)";
 
-        return book;
+        Optional<Book> bookOptional = (Optional<Book>) save(book, queryRunner, connection, sql,
+                book.getTitle(), book.getLanguageIso2(),
+                book.getPageCount(), book.getRetailPrice());
+        bookOptional.ifPresent(b -> saveAuthorsForBook(book, book.getAuthors()));
+
+        return bookOptional;
     }
 
     int saveAuthorsForBook(Book book, List<Author> authors) {
@@ -35,5 +37,27 @@ public class BookRepository implements CrudRepository {
                 "values(?, ?)";
 
         return batchUpdate(authors, sql, queryRunner, connection, book.getId());
+    }
+
+    public Optional<Book> find(String title) {
+        final String sql = "select * from book where title = ?";
+        Optional<Book> optionalBook = Optional.empty();
+
+        try {
+            final ResultSetHandler<Book> resultSetHandler = (rs) -> {
+                if (!rs.next()) {
+                    return null;
+                }
+                return new Book(rs.getLong("id"),
+                        rs.getString("title"),
+                        rs.getString("language_iso2"),
+                        rs.getInt("pageCount"),
+                        rs.getFloat("retailPrice"));
+            };
+            optionalBook = Optional.ofNullable(queryRunner.query(connection, sql, resultSetHandler, title));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return optionalBook;
     }
 }

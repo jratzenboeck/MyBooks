@@ -1,7 +1,6 @@
 package repository;
 
 import entity.Author;
-import org.apache.commons.dbutils.QueryRunner;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,14 +27,18 @@ public class AuthorRepositoryTest {
     public void testSave() {
         Author author = new Author(ANY_NAME);
 
-        Assert.assertNotNull(authorRepository.save(author).getId());
+        Assert.assertTrue(authorRepository.save(author).isPresent());
     }
 
     @Test
     public void testFind() {
-        Long id = authorRepository.save(new Author(ANY_NAME)).getId();
+        authorRepository.save(new Author(ANY_NAME))
+                .ifPresent(savedAuthor -> Assert.assertTrue(authorRepository.find(savedAuthor.getName()).isPresent()));
+    }
 
-        Assert.assertNotNull(authorRepository.find(id));
+    @Test
+    public void testFindFail() {
+        Assert.assertFalse(authorRepository.find("TEST").isPresent());
     }
 
     @After

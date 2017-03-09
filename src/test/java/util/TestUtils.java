@@ -35,17 +35,9 @@ public class TestUtils {
         return user;
     }
 
-    public static Book createTestBook(Category category, String title) {
-        Calendar publishDate = new GregorianCalendar(2015, 10, 10);
+    public static Book createTestBook(String title) {
         return new Book(title, "en",
-                publishDate,
-                category, 800, 39.90f);
-    }
-
-    public static Category createTestCategory() {
-        Category category = new Category("testCategory");
-
-        return category;
+                800, 39.90f);
     }
 
     public static Author createTestAuthor() {

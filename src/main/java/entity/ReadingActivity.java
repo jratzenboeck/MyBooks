@@ -18,15 +18,6 @@ public class ReadingActivity extends BaseEntity {
     private int bookmark;
     private List<ReadingDiaryEntry> readingDiary;
 
-    public ReadingActivity(User user, Book book, Calendar startReading, Calendar endReading, int bookmark) {
-        this.user = user;
-        this.book = book;
-        this.startReading = startReading;
-        this.endReading = endReading;
-        this.bookmark = bookmark;
-        this.readingDiary = new ArrayList<>();
-    }
-
     public ReadingActivity(Book book, Calendar startReading, Calendar endReading, int bookmark) {
         this.book = book;
         this.startReading = startReading;
@@ -37,5 +28,13 @@ public class ReadingActivity extends BaseEntity {
     public ReadingActivity(User user, Book book) {
         this.user = user;
         this.book = book;
+        this.startReading = Calendar.getInstance();
+        this.endReading = null;
+        this.bookmark = 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Title: " + book.getTitle();
     }
 }

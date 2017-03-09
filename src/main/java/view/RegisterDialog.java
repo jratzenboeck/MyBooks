@@ -35,7 +35,7 @@ public class RegisterDialog extends JDialog {
         header.setFont(new Font("Arial", Font.BOLD, 14));
         constraints.gridx = 0;
         constraints.gridy = 0;
-        contentPane.add(header);
+        contentPane.add(header, constraints);
 
         JLabel lUsername = new JLabel("Username");
         lUsername.setPreferredSize(new Dimension(100, 20));

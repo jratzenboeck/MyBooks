@@ -19,19 +19,17 @@ CREATE TABLE author
     id INT(4) PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(64) NOT NULL
 );
+CREATE UNIQUE INDEX author_name_uindex ON author (name);
 
 CREATE TABLE book
 (
     id INT(4) PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(64) NOT NULL,
-    publish_date DATE NOT NULL,
     language_iso2 VARCHAR(2) NOT NULL,
     pageCount INT(4) NOT NULL,
-    retailPrice FLOAT,
-    category_id INT(4) NOT NULL,
-    CONSTRAINT book_Category_id_fk FOREIGN KEY (category_id) REFERENCES Category (id)
+    retailPrice FLOAT
 );
-CREATE INDEX book_Category_id_fk ON book (category_id);
+CREATE UNIQUE INDEX book_title_uindex ON book (title);
 
 CREATE TABLE author_book
 (

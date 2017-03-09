@@ -10,13 +10,14 @@ import util.TestUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Optional;
 
 public class ReadingActivityRepositoryTest {
 
     private ReadingActivityRepository readingActivityRepository;
     private UserRepository userRepository;
     private BookRepository bookRepository;
-    private CategoryRepository categoryRepository;
     private AuthorRepository authorRepository;
     private Connection conn;
 
@@ -26,23 +27,23 @@ public class ReadingActivityRepositoryTest {
         readingActivityRepository = new ReadingActivityRepository(conn);
         userRepository = new UserRepository(conn);
         bookRepository = new BookRepository(conn);
-        categoryRepository = new CategoryRepository(conn);
         authorRepository = new AuthorRepository(conn);
     }
+    // TODO: Overthink .get() calls
 
     @Test
     public void testSave() {
-        User user = userRepository.save(createTestUser());
+        User user = userRepository.save(createTestUser()).get();
 
-        Assert.assertNotNull(readingActivityRepository.save(createReadingActivity(user, "Hello Startup")).getId());
+        Assert.assertTrue(readingActivityRepository.save(createReadingActivity(user, "Hello Startup")).isPresent());
     }
 
     @Test
     public void testEndReadingActivity() {
-        User user = userRepository.save(createTestUser());
+        User user = userRepository.save(createTestUser()).get();
 
         ReadingActivity readingActivity = createReadingActivity(user, "Java 8 in Action");
-        readingActivity = readingActivityRepository.save(readingActivity);
+        readingActivity = readingActivityRepository.save(readingActivity).get();
         int updatedRows = readingActivityRepository.endReadingActivity(
                 readingActivity.getId(), Calendar.getInstance());
 
@@ -51,21 +52,27 @@ public class ReadingActivityRepositoryTest {
 
     @Test
     public void testGetCurrentReadingActivities() {
-        User user = userRepository.save(createTestUser());
+        User user = userRepository.save(createTestUser()).get();
 
         readingActivityRepository.save(createReadingActivity(user, "Hello Startup"));
 
-        Assert.assertEquals(1, readingActivityRepository.getCurrentReadingActivities(user.getId()).size());
+        Optional<List<ReadingActivity>> activityList = readingActivityRepository.getCurrentReadingActivities(user.getId());
+        if (activityList.isPresent()) {
+            Assert.assertEquals(1, activityList.get().size());
+        } else {
+            Assert.fail("No Reading activities");
+        }
     }
 
     @Test
     public void testGetCurrentReadingActivitiesEmpty() {
-        User user = userRepository.save(createTestUser());
+        User user = userRepository.save(createTestUser()).get();
 
-        ReadingActivity activityToBeEnded = readingActivityRepository.save(createReadingActivity(user, "Java 8 in Action"));
+        ReadingActivity activityToBeEnded = readingActivityRepository
+                .save(createReadingActivity(user, "Java 8 in Action")).get();
         readingActivityRepository.endReadingActivity(activityToBeEnded.getId(), Calendar.getInstance());
 
-        Assert.assertEquals(0, readingActivityRepository.getCurrentReadingActivities(user.getId()).size());
+        Assert.assertFalse(readingActivityRepository.getCurrentReadingActivities(user.getId()).get().size() != 0);
     }
 
     private User createTestUser() {
@@ -73,14 +80,11 @@ public class ReadingActivityRepositoryTest {
     }
 
     private ReadingActivity createReadingActivity(User user, String bookTitle) {
-        Category category = categoryRepository.save(TestUtils.createTestCategory());
-        Author author = authorRepository.save(TestUtils.createTestAuthor());
-        Book book = TestUtils.createTestBook(category, bookTitle);
+        Author author = authorRepository.save(TestUtils.createTestAuthor()).get();
+        Book book = TestUtils.createTestBook(bookTitle);
         book.addAuthor(author);
-        book = bookRepository.save(book);
-        ReadingActivity readingActivity = new ReadingActivity(user, book);
-
-        return readingActivity;
+        book = bookRepository.save(book).get();
+        return new ReadingActivity(user, book);
     }
 
     @After

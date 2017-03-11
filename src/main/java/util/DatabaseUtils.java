@@ -43,7 +43,7 @@ public class DatabaseUtils {
         return getDatabaseConnection("prod");
     }
 
-    public static Connection getDatabaseConnectionForTest() {
+    static Connection getDatabaseConnectionForTest() {
         return getDatabaseConnection("test");
     }
 

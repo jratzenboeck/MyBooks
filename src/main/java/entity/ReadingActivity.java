@@ -12,13 +12,13 @@ import java.util.List;
 public class ReadingActivity extends BaseEntity {
 
     private User user;
-    private final Book book;
+    private Book book;
     private Calendar startReading;
     private Calendar endReading;
     private int bookmark;
-    private List<ReadingDiaryEntry> readingDiary;
 
-    public ReadingActivity(Book book, Calendar startReading, Calendar endReading, int bookmark) {
+    public ReadingActivity(Long id, Book book, Calendar startReading, Calendar endReading, int bookmark) {
+        super(id);
         this.book = book;
         this.startReading = startReading;
         this.endReading = endReading;
@@ -31,6 +31,10 @@ public class ReadingActivity extends BaseEntity {
         this.startReading = Calendar.getInstance();
         this.endReading = null;
         this.bookmark = 0;
+    }
+
+    public ReadingActivity(Long id) {
+        super(id);
     }
 
     @Override

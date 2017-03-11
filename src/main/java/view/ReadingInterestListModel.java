@@ -9,7 +9,7 @@ public class ReadingInterestListModel extends AbstractListModel {
 
     private final List<Category> readingInterests;
 
-    public ReadingInterestListModel(List<Category> readingInterests) {
+    ReadingInterestListModel(List<Category> readingInterests) {
         this.readingInterests = readingInterests;
     }
 

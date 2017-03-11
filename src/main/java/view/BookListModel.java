@@ -3,14 +3,13 @@ package view;
 import entity.Book;
 
 import javax.swing.*;
-import javax.swing.event.ListDataListener;
 import java.util.List;
 
 public class BookListModel extends AbstractListModel {
 
     private final List<Book> books;
 
-    public BookListModel(List<Book> books) {
+    BookListModel(List<Book> books) {
         this.books = books;
     }
 
@@ -24,7 +23,7 @@ public class BookListModel extends AbstractListModel {
         return books.get(index);
     }
 
-    public void addBooksToModel(List<Book> books) {
+    void addBooksToModel(List<Book> books) {
         this.books.addAll(books);
     }
 

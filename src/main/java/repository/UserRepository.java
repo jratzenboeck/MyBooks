@@ -34,7 +34,7 @@ public class UserRepository implements CrudRepository {
         return optionalUser;
     }
 
-    public int saveReadingInterests(User user, List<Category> readingInterests) {
+    private int saveReadingInterests(User user, List<Category> readingInterests) {
         final String sql = "insert into reading_interest(category_id, user_id) values(?, ?)";
 
         return batchUpdate(readingInterests, sql, queryRunner, connection, user.getId());

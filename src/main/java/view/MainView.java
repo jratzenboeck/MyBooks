@@ -10,24 +10,20 @@ import service.MyBooksService;
 import util.CalendarUtils;
 
 import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.CompletableFuture;
 
 public class MainView extends JFrame implements Observer {
 
-    private final MyBooksService booksService;
+    private MyBooksService booksService;
     private final User user;
-    private JPanel interestingBooks;
     private JPanel myBooks;
     private JList listBooks;
-    private JButton bPrev, bNext;
+    private JButton bPrev;
+    private JButton bNext;
     private JLabel lReadingActivityTitle;
     private JLabel lReadingActivityStartReading;
     private GridBagConstraints constraints;
@@ -35,8 +31,14 @@ public class MainView extends JFrame implements Observer {
     private int currentReadingActivityIndex;
     private BookListModel bookListModel;
 
-    public MainView(User user) {
+    MainView(User user) {
         this.user = user;
+        initReadingActivities();
+
+        prepareGUI();
+    }
+
+    private void initReadingActivities() {
         booksService = new MyBooksService();
         booksService.addObserver(this);
         currentReadingActivityIndex = 0;
@@ -46,8 +48,6 @@ public class MainView extends JFrame implements Observer {
         } catch (NoReadingActivitiesException e) {
             JOptionPane.showMessageDialog(this, "Your reading activities could not be loaded", "Error while loading reading activities", JOptionPane.ERROR_MESSAGE);
         }
-
-        prepareGUI();
     }
 
     private void prepareGUI() {
@@ -55,7 +55,7 @@ public class MainView extends JFrame implements Observer {
         this.setSize(1000, 800);
         Container contentPane = getContentPane();
 
-        interestingBooks = new JPanel(new BorderLayout(10, 10));
+        JPanel interestingBooks = new JPanel(new BorderLayout(10, 10));
 
         JLabel lHeaderInterestingBooks = new JLabel("Books you could be interested in");
         lHeaderInterestingBooks.setPreferredSize(new Dimension(300, 20));
@@ -90,11 +90,13 @@ public class MainView extends JFrame implements Observer {
         bPrev.setEnabled(false);
         bNext = new JButton(">");
         bNext.setEnabled(false);
-        prepareFirstReadingActivity();
-        prepareControlButtons();
+
+        showFirstReadingActivity();
+        showReadingDiaryButtons();
+        showControlButtons();
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, interestingBooks, myBooks);
-        splitPane.setDividerLocation(700);
+        splitPane.setDividerLocation(550);
 
         contentPane.add(splitPane);
 
@@ -108,7 +110,7 @@ public class MainView extends JFrame implements Observer {
                         completableFuture.thenAcceptAsync(this::showBookInformation));
     }
 
-    private void prepareFirstReadingActivity() {
+    private void showFirstReadingActivity() {
         lReadingActivityTitle = new JLabel();
         lReadingActivityTitle.setPreferredSize(new Dimension(300, 20));
         constraints.gridx = 0;
@@ -144,29 +146,46 @@ public class MainView extends JFrame implements Observer {
         lReadingActivityTitle.setText(currentReadingActivityTitle);
     }
 
-    private void prepareControlButtons() {
-        bPrev.setPreferredSize(new Dimension(100, 20));
-
-        bPrev.addActionListener(this::showNextReadingActivity);
+    private void showControlButtons() {
         constraints.gridx = 0;
-        constraints.gridy = 3;
         constraints.gridwidth = 1;
+
+        bPrev.setPreferredSize(new Dimension(100, 20));
+        bPrev.addActionListener((event) -> showNextReadingActivity());
+        constraints.gridy = 4;
         myBooks.add(bPrev, constraints);
 
-
         bPrev.setPreferredSize(new Dimension(100, 20));
-
-        bNext.addActionListener(this::showPrevReadingActivity);
+        bNext.addActionListener((event) -> showPrevReadingActivity());
         constraints.gridx = 1;
         myBooks.add(bNext, constraints);
     }
 
-    private void showNextReadingActivity(ActionEvent event) {
+    private void showReadingDiaryButtons() {
+        constraints.gridy = 3;
+        constraints.gridwidth = 1;
+
+        JButton bAddDiaryEntry = new JButton("Add reading diary entry");
+        bAddDiaryEntry.setPreferredSize(new Dimension(100, 20));
+        bAddDiaryEntry.addActionListener((l) ->
+                new AddReadingDiaryEntryDialog(readingActivities
+                        .get(currentReadingActivityIndex)));
+        constraints.gridx = 0;
+        myBooks.add(bAddDiaryEntry, constraints);
+
+        JButton bShowDiaryEntries = new JButton(("Show reading diary"));
+        bShowDiaryEntries.setPreferredSize(new Dimension(100, 20));
+        // TODO: Add action listener
+        constraints.gridx = 1;
+        myBooks.add(bShowDiaryEntries, constraints);
+    }
+
+    private void showNextReadingActivity() {
         currentReadingActivityIndex++;
         showReadingActivity();
     }
 
-    private void showPrevReadingActivity(ActionEvent event) {
+    private void showPrevReadingActivity() {
         currentReadingActivityIndex--;
         showReadingActivity();
     }
@@ -193,8 +212,6 @@ public class MainView extends JFrame implements Observer {
                         JOptionPane.showMessageDialog(this,
                                 e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
-                } else {
-                    // Nothing to do
                 }
             });
         }

@@ -17,7 +17,7 @@ public interface CrudRepository {
         try {
             obj.setId(queryRunner.insert(connection, sql,
                     getIdResultSetHandler(), params));
-            optionalBaseEntity = Optional.ofNullable(obj);
+            optionalBaseEntity = Optional.of(obj);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -27,7 +27,7 @@ public interface CrudRepository {
     default ResultSetHandler<Long> getIdResultSetHandler() {
         return (rs) -> {
             if (!rs.next()) {
-                return null;
+                throw new SQLException("Id of saved object could not be retrieved.");
             }
             return rs.getLong(1);
         };

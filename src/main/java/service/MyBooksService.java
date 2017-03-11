@@ -5,9 +5,10 @@ import entity.*;
 import exceptions.BookNotSavedException;
 import exceptions.NoReadingActivitiesException;
 import exceptions.ReadingActivityNotSavedException;
+import exceptions.ReadingDiaryEntryNotSaved;
 import repository.*;
 import util.DatabaseUtils;
-import util.HttpNoSuccessException;
+import exceptions.HttpNoSuccessException;
 import util.HttpUtils;
 import util.PasswordHashing;
 
@@ -30,6 +31,7 @@ public class MyBooksService extends Observable {
     private final ReadingActivityRepository readingActivityRepository;
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final ReadingDiaryRepository diaryRepository;
 
     public MyBooksService() {
         final Connection dbConnection = DatabaseUtils.getDatabaseConnectionForProd();
@@ -38,6 +40,7 @@ public class MyBooksService extends Observable {
         readingActivityRepository = new ReadingActivityRepository(dbConnection);
         bookRepository = new BookRepository(dbConnection);
         authorRepository = new AuthorRepository(dbConnection);
+        diaryRepository = new ReadingDiaryRepository(dbConnection);
     }
 
     private String getUrlOfRequest(String query) {
@@ -130,20 +133,25 @@ public class MyBooksService extends Observable {
             if (!savedAuthorOptional.isPresent()) {
                 savedAuthorOptional = authorRepository.save(author);
             }
-            savedAuthorOptional.ifPresent(bookAuthors::add);
+            savedAuthorOptional.ifPresent(bookAuthors::add);    // If possible save authors
         });
         Optional<Book> savedBookOptional = bookRepository.find(book.getTitle());
         if (!savedBookOptional.isPresent()) {
             savedBookOptional = bookRepository.save(book);
         }
         Book savedBook = savedBookOptional.orElseThrow(() -> new BookNotSavedException("Book " + book.getTitle() + " could not be saved"));
-        savedBook.getAuthors().addAll(bookAuthors);
+        savedBook.addAuthors(bookAuthors);
 
         ReadingActivity readingActivity = readingActivityRepository.save(new ReadingActivity(user, savedBook))
                 .orElseThrow(() -> new ReadingActivityNotSavedException("Reading activity could not be saved."));
+
         super.setChanged();
         super.notifyObservers(readingActivity);
 
         return readingActivity;
+    }
+
+    public void saveReadingDiaryEntry(ReadingDiaryEntry diaryEntry) throws ReadingDiaryEntryNotSaved {
+        diaryRepository.save(diaryEntry).orElseThrow(() -> new ReadingDiaryEntryNotSaved("The diary entry could not be saved."));
     }
 }

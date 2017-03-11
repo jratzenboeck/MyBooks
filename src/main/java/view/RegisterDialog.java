@@ -5,21 +5,17 @@ import service.MyBooksService;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
-public class RegisterDialog extends JDialog {
+class RegisterDialog extends JDialog {
 
     private final MyBooksService bookService;
     private JTextField tUsername;
     private JPasswordField passwordField;
     private JList listReadingInterests;
 
-    public RegisterDialog() {
+    RegisterDialog() {
         this.bookService = new MyBooksService();
-        prepareGUI();
-    }
 
-    public void prepareGUI() {
         this.setTitle("Register");
         this.setModal(true);
 
@@ -87,7 +83,7 @@ public class RegisterDialog extends JDialog {
 
         JButton bSave = new JButton("Save");
         bSave.setPreferredSize(new Dimension(100, 20));
-        bSave.addActionListener(this::registerUser);
+        bSave.addActionListener((e) -> registerUser());
         constraints.gridx = 1;
         constraints.gridwidth = 1;
         contentPane.add(bSave, constraints);
@@ -96,7 +92,7 @@ public class RegisterDialog extends JDialog {
         this.setVisible(true);
     }
 
-    public void registerUser(ActionEvent e) {
+    private void registerUser() {
         User registeredUser = bookService.
                 registerUser(tUsername.getText(), passwordField.getPassword(),
                         listReadingInterests.getSelectedValuesList());
@@ -107,5 +103,4 @@ public class RegisterDialog extends JDialog {
         }
         this.setVisible(false);
     }
-
 }

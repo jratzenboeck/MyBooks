@@ -2,6 +2,7 @@ package util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import exceptions.HttpNoSuccessException;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
@@ -14,9 +15,7 @@ public class HttpUtils {
 
     private static HttpsURLConnection openConnection(String route) throws IOException {
         URL url = new URL(route);
-        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-
-        return con;
+        return (HttpsURLConnection) url.openConnection();
     }
 
     public static JsonNode get(String route) throws IOException, HttpNoSuccessException {
@@ -26,7 +25,7 @@ public class HttpUtils {
         JsonNode response = objectMapper.readTree(connection.getInputStream());
 
         if (responseCode != 200) {
-            throw new HttpNoSuccessException("Http call failed", responseCode);
+            throw new HttpNoSuccessException();
         } else {
             return response;
         }

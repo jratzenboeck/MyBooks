@@ -18,8 +18,7 @@ public class PasswordHashing {
             SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
             PBEKeySpec spec = new PBEKeySpec(passwordPlain, salt, ITERATIONS, KEY_LENGTH);
             SecretKey key = skf.generateSecret( spec );
-            byte[] result = key.getEncoded();
-            return result;
+            return key.getEncoded();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }

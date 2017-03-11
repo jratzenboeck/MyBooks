@@ -1,29 +1,25 @@
 package view;
 
 import entity.User;
-import repository.UserRepository;
 import service.MyBooksService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class Login extends JFrame {
 
     private final MyBooksService booksService;
-    private JTextField tUsername;
-    private JPasswordField passwordField;
+    private final JTextField tUsername;
+    private final JPasswordField passwordField;
 
     public Login() {
         booksService = new MyBooksService();
-        prepareGUI();
-    }
 
-    private void prepareGUI() {
         this.setTitle("Login");
 
         Container contentPane = getContentPane();
+        contentPane.setLayout(new BorderLayout());
 
         JLabel lHeader = new JLabel("My Books");
         lHeader.setHorizontalAlignment(SwingConstants.CENTER);
@@ -34,7 +30,7 @@ public class Login extends JFrame {
 
         JPanel loginData = new JPanel();
         loginData.setBorder(new EmptyBorder(10, 10, 10, 10));
-        loginData.setLayout(new GridLayout(2, 2, 10, 5));
+        loginData.setLayout(new GridLayout(3, 2, 10, 10));
 
         JLabel lUsername = new JLabel("Username");
         lUsername.setPreferredSize(new Dimension(100, 20));
@@ -48,20 +44,9 @@ public class Login extends JFrame {
         passwordField = new JPasswordField();
         passwordField.setPreferredSize(new Dimension(200, 20));
 
-        loginData.add(lUsername);
-        loginData.add(tUsername);
-        loginData.add(lPassword);
-        loginData.add(passwordField);
-
-        contentPane.add(loginData, BorderLayout.CENTER);
-
-        JPanel buttonPane = new JPanel();
-        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.PAGE_AXIS));
-        buttonPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-
         JButton bLogin = new JButton("Login");
         bLogin.setPreferredSize(new Dimension(50, 20));
-        bLogin.addActionListener(this::login);
+        bLogin.addActionListener((event) -> login());
 
         JButton bRegister = new JButton("Not yet an account?");
         bRegister.setPreferredSize(new Dimension(50, 10));
@@ -70,22 +55,27 @@ public class Login extends JFrame {
         bRegister.setBackground(Color.WHITE);
         bRegister.addActionListener((event) -> new RegisterDialog());
 
-        buttonPane.add(bLogin);
-        buttonPane.add(bRegister);
+        loginData.add(lUsername);
+        loginData.add(tUsername);
+        loginData.add(lPassword);
+        loginData.add(passwordField);
+        loginData.add(bLogin);
+        loginData.add(bRegister);
 
-        contentPane.add(buttonPane, BorderLayout.PAGE_END);
+        contentPane.add(loginData, BorderLayout.CENTER);
 
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         this.setVisible(true);
         this.pack();
     }
 
-    private void login(ActionEvent event) {
-        User user = booksService.loginUser(tUsername.getText(), passwordField.getPassword());
-        if (user == null) {
-            JOptionPane.showMessageDialog(this, "Username or password invalid", "Authentication failed", JOptionPane.ERROR_MESSAGE);
-        } else {
+    private void login() {
+        try {
+            User user = booksService.loginUser(tUsername.getText(), passwordField.getPassword());
             new MainView(user);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Username or password invalid", "Authentication failed", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

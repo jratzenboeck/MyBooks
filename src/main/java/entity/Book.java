@@ -38,12 +38,14 @@ public class Book extends BaseEntity {
         authors.add(author);
     }
 
+    public void addAuthors(List<Author> authors) { authors.addAll(authors); }
+
     @Override
     public String toString() {
         return "Title: " + title + "; Authors: " + getAuthorsFormatted();
     }
 
-    public String getAuthorsFormatted() {
+    private String getAuthorsFormatted() {
         return authors
                 .stream()
                 .map(Author::getName)

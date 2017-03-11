@@ -33,7 +33,7 @@ public class ReadingActivityRepository implements CrudRepository {
     }
 
     public Optional<List<ReadingActivity>> getCurrentReadingActivities(Long userId) {
-        final String sql = "select r.start_reading as start, r.end_reading as end, " +
+        final String sql = "select r.id, r.start_reading as start, r.end_reading as end, " +
                 "r.bookmark as bookmark, b.title as title, " +
                 "b.language_iso2 as iso2, b.pageCount as pageCount, " +
                 "b.retailPrice as price, a.id as authorId " +
@@ -53,9 +53,10 @@ public class ReadingActivityRepository implements CrudRepository {
                             rs.getString("iso2"),
                             rs.getInt("pageCount"),
                             rs.getFloat("price"));
-                    ReadingActivity activity = new ReadingActivity(book,
-                            CalendarUtils.parseCalendar(rs.getDate("start")).orElse(null),
-                            CalendarUtils.parseCalendar(rs.getDate("end")).orElse(null),
+                    ReadingActivity activity = new ReadingActivity(rs.getLong("id"),
+                            book,
+                            CalendarUtils.parseCalendar(rs.getTimestamp("start")).orElse(null),
+                            CalendarUtils.parseCalendar(rs.getTimestamp("end")).orElse(null),
                             rs.getInt("bookmark"));
                     readingActivities.add(activity);
                 }

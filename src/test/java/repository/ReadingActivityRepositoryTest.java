@@ -68,11 +68,10 @@ public class ReadingActivityRepositoryTest {
     public void testGetCurrentReadingActivitiesEmpty() {
         User user = userRepository.save(createTestUser()).get();
 
-        ReadingActivity activityToBeEnded = readingActivityRepository
-                .save(createReadingActivity(user, "Java 8 in Action")).get();
+        ReadingActivity activityToBeEnded = readingActivityRepository.save(createReadingActivity(user, "Java 8 in Action")).get();
         readingActivityRepository.endReadingActivity(activityToBeEnded.getId(), Calendar.getInstance());
 
-        Assert.assertFalse(readingActivityRepository.getCurrentReadingActivities(user.getId()).get().size() != 0);
+        Assert.assertTrue(readingActivityRepository.getCurrentReadingActivities(user.getId()).get().isEmpty());
     }
 
     private User createTestUser() {
